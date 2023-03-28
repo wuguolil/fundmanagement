@@ -24,6 +24,9 @@ public class FileDownloader {
             
             outputStream.close();
             inputStream.close();
+        } else if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+            String newUrl = connection.getHeaderField("Location");
+            downloadFile(newUrl, saveFilePath); // 递归调用downloadFile()方法以获取重定向后的文件
         } else {
             throw new Exception("HTTP request failed with error code: " + responseCode);
         }
