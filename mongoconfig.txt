@@ -1,0 +1,39 @@
+import com.mongodb.MongoClientSettings;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+@Configuration
+@EnableMongoRepositories(basePackages = "com.example.repository")
+public class MongoConfig {
+
+    @Value("${spring.data.mongodb.host}")
+    private String host;
+
+    @Value("${spring.data.mongodb.port}")
+    private int port;
+
+    @Value("${spring.data.mongodb.database}")
+    private String database;
+
+    @Value("${mongodb.username}")
+    private String username;
+
+    @Value("${mongodb.password}")
+    private String encryptedPassword;
+
+    @Override
+    public MongoClientSettings mongoClientSettings() {
+        String password = EncryptionUtils.decrypt(encryptedPassword);
+
+        MongoClientSettings.Builder builder = MongoClientSettings.builder()
+                .applyToClusterSettings(settings -> settings.hosts(Arrays.asList(new ServerAddress(host, port))))
+                .credential(MongoCredential.createCredential(username, database, password.toCharArray()));
+        return builder.build();
+    }
+}
+
+
+
+
