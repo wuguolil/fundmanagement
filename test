@@ -13,8 +13,8 @@ public class StatusValidator implements ConstraintValidator<ValidateString, Stri
 
     @Override
     public void initialize(ValidateString constraintAnnotation) {
-        validValues = EnumSet.allOf(constraintAnnotation.value())
-                .stream()
+        Class<? extends Enum<?>> enumClass = constraintAnnotation.value();
+        validValues = Arrays.stream(enumClass.getEnumConstants())
                 .map(Enum::name)
                 .collect(Collectors.toSet());
     }
