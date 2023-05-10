@@ -1,39 +1,29 @@
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = StatusValidator.class)
-public @interface ValidateString {
-    String message() default "Invalid status";
+@Constraint(validatedBy = DisallowExtentionsValidator.class)
+public @interface DisallowExtentions {
+    String message() default "This value is not allowed.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-    Class<? extends Enum<?>> value();
 }
 
-public class StatusValidator implements ConstraintValidator<ValidateString, String> {
-    private Set<String> validValues;
+public class DisallowExtentionsValidator implements ConstraintValidator<DisallowExtentions, List<String>> {
+    private List<String> disallowedExtentions;
 
-    @Override
-    public void initialize(ValidateString constraintAnnotation) {
-        Class<? extends Enum<?>> enumClass = constraintAnnotation.value();
-        validValues = Arrays.stream(enumClass.getEnumConstants())
-                .map(Enum::name)
-                .collect(Collectors.toSet());
+    public DisallowExtentionsValidator(List<String> disallowedExtentions) {
+        this.disallowedExtentions = disallowedExtentions;
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        return validValues.contains(value);
+    public void initialize(DisallowExtentions constraintAnnotation) {}
+
+    @Override
+    public boolean isValid(List<String> extentions, ConstraintValidatorContext context) {
+        for (String extention : extentions) {
+            if (disallowedExtentions.contains(extention)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
-
-
-@ValidateString(Status.class)
-private String status;
-
-public enum Status {
-    ACTIVE,
-    INACTIVE,
-    DELETED;
-}
-
-@ValidateString(Status.class)
-String status;
