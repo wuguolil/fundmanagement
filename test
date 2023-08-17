@@ -1,1 +1,18 @@
-test
+{
+  <% if (ctx.requestId != null) { %>
+  "requestId": "%X{requestId}",
+  <% } %>
+  "level": "%level",
+  "logger": "%logger",
+  "message": "%msg",
+  "thread": "%thread",
+  "timestamp": {
+    "$resolver": "timestamp",
+    "pattern": {
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+      "timeZone": "UTC"
+    }
+  },
+  "customField1": "value1",
+  "customField2": "value2"
+}
