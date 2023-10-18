@@ -1,40 +1,16 @@
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = MyInterfaceImpl1.class, name = "impl1"),
+    @JsonSubTypes.Type(value = MyInterfaceImpl2.class, name = "impl2")
+})
+public interface MyInterface {
+    // your interface definition here
+}
 
-public class FileDownloader {
-  
-    public static void downloadFile(String fileUrl, String saveFilePath) throws Exception {
-        URL url = new URL(fileUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setConnectTimeout(5000);
-        
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            InputStream inputStream = connection.getInputStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            FileOutputStream outputStream = new FileOutputStream(saveFilePath);
-            
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-            
-            outputStream.close();
-            inputStream.close();
-        } else if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
-            String newUrl = connection.getHeaderField("Location");
-            downloadFile(newUrl, saveFilePath); // 递归调用downloadFile()方法以获取重定向后的文件
-        } else {
-            throw new Exception("HTTP request failed with error code: " + responseCode);
-        }
-    }
+public class MyInterfaceImpl1 implements MyInterface {
+    // your implementation here
+}
 
-    public static void main(String[] args) throws Exception {
-        String fileUrl = "http://example.com/file-to-download.txt";
-        String saveFilePath = "C:/Downloads/file-to-download.txt";
-        downloadFile(fileUrl, saveFilePath);
-    }
+public class MyInterfaceImpl2 implements MyInterface {
+    // your implementation here
 }
