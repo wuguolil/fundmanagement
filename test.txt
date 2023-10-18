@@ -1,16 +1,43 @@
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = MyInterfaceImpl1.class, name = "impl1"),
-    @JsonSubTypes.Type(value = MyInterfaceImpl2.class, name = "impl2")
-})
-public interface MyInterface {
-    // your interface definition here
-}
-
-public class MyInterfaceImpl1 implements MyInterface {
-    // your implementation here
-}
-
-public class MyInterfaceImpl2 implements MyInterface {
-    // your implementation here
-}
+openapi: 3.0.0
+info:
+  title: My API
+  version: 1.0.0
+paths:
+  /my-endpoint:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyRequest'
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    MyRequest:
+      type: object
+      properties:
+        myProperty:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          myImpl1: '#/components/schemas/MyImpl1'
+          myImpl2: '#/components/schemas/MyImpl2'
+    MyImpl1:
+      allOf:
+        - $ref: '#/components/schemas/MyRequest'
+        - type: object
+          properties:
+            myImpl1Property:
+              type: string
+      description: My implementation 1
+    MyImpl2:
+      allOf:
+        - $ref: '#/components/schemas/MyRequest'
+        - type: object
+          properties:
+            myImpl2Property:
+              type: string
+      description: My implementation 2
